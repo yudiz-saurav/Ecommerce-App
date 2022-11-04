@@ -1,0 +1,21 @@
+module.exports = {
+  add_success: '## added successfully.',
+  auth_failed: 'Please enter a valid credentials.',
+  not_found: '## Not Found',
+  success: '## successfully',
+  intenalServerError: 'Something went wrong',
+  invalid: 'invalid ##',
+  valid: 'Please provide valid ##',
+  invalidFormat: 'Invalid ## format',
+  unique: 'Enter unique ##',
+  unAuthorized: 'Unauthorized Access Denied',
+  sessionExpired: 'Session expired please login again',
+  exist: '## is already exists',
+  adminiStrator: 'Please Contact to Super Administrator',
+  required: '## is required',
+  succ_logout: 'You have successfully logged out!',
+  succ_login: 'Welcome Back! You have logged in successfully.',
+  update_success: '## updated successfully.',
+  admin_blocked: 'You are blocked by our system. Contact administrator for more details.',
+  data_required: 'Something required to update'
+}
