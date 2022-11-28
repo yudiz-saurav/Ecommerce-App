@@ -2,7 +2,6 @@ const { pick, removeNull, isValidName, catchError, validMongoId } = require('../
 const { status, messages, jsonStatus } = require('../../helper/api.responses')
 
 const validators = {}
-// sName as state, slug
 validators.addCity = (req, res, next) => {
   try {
     req.body = pick(req.body, ['sName'])

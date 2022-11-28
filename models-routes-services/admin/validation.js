@@ -26,11 +26,9 @@ validators.addAdmin = (req, res, next) => {
 
 validators.login = (req, res, next) => {
   try {
-    console.log('++++++' + req.language)
     req.body = pick(req.body, ['sEmail', 'sPassword'])
     removeNull(req.body)
     const { sEmail, sPassword } = req.body
-    console.log('req.language login', req.language)
     if (!sPassword && !sEmail) return res.status(status.BadRequest).json({ status: jsonStatus.BadRequest, message: messages[req.language].required.replace('##', messages[req.language].emailAndPassword) })
     if (!sEmail) return res.status(status.BadRequest).json({ status: jsonStatus.BadRequest, message: messages[req.language].required.replace('##', messages[req.language].email) })
     if (!isValidEmail(sEmail)) return res.status(status.BadRequest).json({ status: jsonStatus.BadRequest, message: messages[req.language].invalid.replace('##', messages[req.language].email) })

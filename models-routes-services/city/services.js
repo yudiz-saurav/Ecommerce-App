@@ -3,7 +3,6 @@ const { status, jsonStatus, messages } = require('../../helper/api.responses')
 const { pick, catchError, slug } = require('../../helper/utilities.services')
 const State = require('../state/model')
 const { default: mongoose } = require('mongoose')
-// fine tune
 
 async function removeCity (id, session) {
   try {
@@ -31,7 +30,6 @@ async function removeCityState (id, session) {
 }
 
 class Cities {
-  // improvement use built in method use transaction if possible
   async addCity (req, res) {
     try {
       req.body = pick(req.body, ['sName'])
@@ -62,7 +60,6 @@ class Cities {
     }
   }
 
-  // update city name already exist
   async updateCity (req, res) {
     try {
       req.body = pick(req.body, ['sName', 'stateId'])

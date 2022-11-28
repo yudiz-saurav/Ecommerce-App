@@ -18,7 +18,6 @@ class States {
     }
   }
 
-  // add pagination same as user list
   async stateList (req, res) {
     try {
       const { start = 1, limit = 10, sorting = 1, search } = req.query
@@ -36,7 +35,6 @@ class States {
     }
   }
 
-  // try in single query
   async updateState (req, res) {
     try {
       req.body = pick(req.body, ['sName'])
@@ -51,7 +49,6 @@ class States {
     }
   }
 
-  // delte city too
   async deleteState (req, res) {
     try {
       const { id } = req.params

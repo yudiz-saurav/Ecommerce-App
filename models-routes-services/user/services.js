@@ -26,8 +26,6 @@ class Users {
       query = search && estatus ? { ...query, $or: [{ sUsername: { $regex: new RegExp('^.*' + search + '.*', 'i') } }, { sEmail: { $regex: new RegExp('^.*' + search + '.*', 'i') } }, { sMobNum: { $regex: new RegExp('^.*' + search + '.*', 'i') } }], eStatus: estatus } : query
       query = estatus ? { ...query, eStatus: estatus } : query
       const startIndex = (start - 1) * limit
-      // use countdocuments
-
       const totalUser = await Admin.countDocuments().lean()
       const users = await Admin.find(query, projection).sort(sorting).skip(Number(startIndex)).limit(Number(limit)).lean()
       return res.status(status.OK).json({ status: jsonStatus.OK, message: messages[req.language].user_fetch_succ, data: { users, usersCount: totalUser } })
