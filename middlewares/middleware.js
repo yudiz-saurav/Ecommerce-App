@@ -21,6 +21,8 @@ const adminAuth = (req, res, next) => {
     req.language = req.header('language') || 'English'
     next()
   } catch (error) {
+    console.log('error')
+    console.log(error)
     return catchError('adminAuth', error, req, res)
   }
 }

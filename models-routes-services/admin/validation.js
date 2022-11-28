@@ -26,11 +26,9 @@ validators.addAdmin = (req, res, next) => {
 
 validators.login = (req, res, next) => {
   try {
-    console.log('++++++' + req.language)
     req.body = pick(req.body, ['sEmail', 'sPassword'])
     removeNull(req.body)
     const { sEmail, sPassword } = req.body
-    console.log('req.language login', req.language)
     if (!sPassword && !sEmail) return res.status(status.BadRequest).json({ status: jsonStatus.BadRequest, message: messages[req.language].required.replace('##', messages[req.language].emailAndPassword) })
     if (!sEmail) return res.status(status.BadRequest).json({ status: jsonStatus.BadRequest, message: messages[req.language].required.replace('##', messages[req.language].email) })
     if (!isValidEmail(sEmail)) return res.status(status.BadRequest).json({ status: jsonStatus.BadRequest, message: messages[req.language].invalid.replace('##', messages[req.language].email) })
@@ -83,4 +81,42 @@ validators.changePassword = async (req, res, next) => {
   }
 }
 
+validators.sendOTP = async (req, res, next) => {
+  try {
+    req.body = pick(req.body, ['sEmail'])
+    removeNull(req.body)
+    const { sEmail } = req.body
+    if (!sEmail) return res.status(status.BadRequest).json({ status: jsonStatus.BadRequest, message: messages[req.language].required.replace('##', messages[req.language].email) })
+    if (!isValidEmail(sEmail)) return res.status(status.BadRequest).json({ status: jsonStatus.BadRequest, message: messages[req.language].invalid.replace('##', messages[req.language].email) })
+    next()
+  } catch (error) {
+    return catchError('InternalServerError', error, req, res)
+  }
+}
+
+validators.verifyOTP = async (req, res, next) => {
+  try {
+    req.body = pick(req.body, ['sEmail', 'sCode'])
+    removeNull(req.body)
+    const { sEmail, sCode } = req.body
+    if (!sEmail) return res.status(status.BadRequest).json({ status: jsonStatus.BadRequest, message: messages[req.language].required.replace('##', messages[req.language].email) })
+    if (!sCode) return res.status(status.BadRequest).json({ status: jsonStatus.BadRequest, message: messages[req.language].required.replace('##', messages[req.language].otp) })
+    next()
+  } catch (error) {
+    return catchError('InternalServerError', error, req, res)
+  }
+}
+
+validators.resetPassword = async (req, res, next) => {
+  try {
+    req.body = pick(req.body, ['sPassword'])
+    removeNull(req.body)
+    const { sPassword } = req.body
+    if (!sPassword) return res.status(status.BadRequest).json({ message: messages.English.required.replace('##', messages.English.password) })
+    if (!isValidPassword(sPassword)) return res.status(status.BadRequest).json({ message: messages.English.invalid.replace('##', messages.English.password) })
+    next()
+  } catch (error) {
+    return catchError('InternalServerError', error, req, res)
+  }
+}
 module.exports = validators

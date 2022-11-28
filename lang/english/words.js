@@ -1,5 +1,6 @@
 module.exports = {
   admin: 'Admin',
+  user: 'User',
   email: 'Email',
   password: 'Password',
   username: 'Username',
@@ -9,5 +10,22 @@ module.exports = {
   oldAndNew: 'Old and New password',
   oldPassword: 'Old Password',
   newPassword: 'New Password',
-  passwordMatch: 'Old and New Password do not match'
+  passwordMatch: 'Old and New Password do not match',
+  otp: 'OTP',
+  block: 'Blocked',
+  active: 'Active',
+  user_stats: ' User Status ',
+  status: 'Status',
+  state: 'State',
+  state_name: 'State Name',
+  city_name: 'City Name',
+  shop_name: 'Shop Name',
+  city: 'City',
+  start: 'Start',
+  limit: 'Limit',
+  sorting: 'Sorting',
+  shop: 'Shop',
+  address: 'Address',
+  rating: 'Rating',
+  businessHrs: 'Business Hours '
 }
