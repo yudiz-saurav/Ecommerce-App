@@ -1,7 +1,8 @@
 const { status, jsonStatus } = require('./api.responses')
+const data = require('../data')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
-const nameRegex = /^[A-Za-z]+$/
+const nameRegex = /^[A-Za-z ]+$/
 const emailRegex = '^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$'
 const mobileRegex = /^[0-9]{10}$/
 const passwordRegex = /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/
@@ -39,6 +40,20 @@ const removeNull = (obj) => {
   }
 }
 
+const isValidStatus = (stats) => {
+  if (data.userStatus.includes(stats)) { return true } else { return false }
+}
+
+const createRandomId = (length = 7) => {
+  let result = ''
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789'
+  const charactersLength = characters.length
+  for (let i = 0; i < length; i += 1) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength))
+  }
+  return result
+}
+
 const pick = (object, keys) => {
   return keys.reduce((obj, key) => {
     if (object && object.hasOwnProperty(key)) {
@@ -61,6 +76,10 @@ const hash = async (plainTextPassword) => {
   return Hash
 }
 
+const slug = (sName) => {
+  const name = sName.trim().toUpperCase().replace(/\s+/g, ' ').split(' ').join('_')
+  return name
+}
 const isValidName = (sName) => {
   return new RegExp(nameRegex).test(sName)
 }
@@ -77,4 +96,4 @@ const isValidPassword = (sPassword) => {
   return new RegExp(passwordRegex).test(sPassword)
 }
 
-module.exports = { removeNull, pick, catchError, encodeToken, decodeToken, isValidName, isValidEmail, isValidMobile, isValidPassword, validMongoId, hash }
+module.exports = { removeNull, pick, slug, catchError, encodeToken, decodeToken, isValidName, isValidStatus, isValidEmail, isValidMobile, isValidPassword, validMongoId, hash, createRandomId }

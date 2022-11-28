@@ -1,7 +1,8 @@
 const Admin = require('./model')
-const { pick, catchError, encodeToken, hash } = require('../../helper/utilities.services')
+const { pick, catchError, encodeToken, hash, createRandomId } = require('../../helper/utilities.services')
 const { status, jsonStatus, messages } = require('../../helper/api.responses')
 const bcrypt = require('bcrypt')
+const OTPVerifications = require('./otpverifcations.model')
 
 class Admins {
   async addAdmin (req, res) {
@@ -63,15 +64,8 @@ class Admins {
 
   async profile (req, res) {
     try {
-      const admin = await Admin.findById(req.admin.id).lean()
-      const adminData = {
-        _id: admin._id,
-        sName: admin.sName,
-        sUsername: admin.sUsername,
-        sEmail: admin.sEmail,
-        sMobNum: admin.sMobNum
-      }
-      return res.status(status.OK).json({ status: jsonStatus.OK, data: adminData })
+      const admin = await Admin.findById(req.admin.id, { _id: 1, sName: 1, sUsername: 1, sEmail: 1, sMobNum: 1 }).lean()
+      return res.status(status.OK).json({ status: jsonStatus.OK, data: { admin } })
     } catch (error) {
       catchError('admin.profile', error, req, res)
     }
@@ -99,6 +93,63 @@ class Admins {
       } else {
         return res.status(status.BadRequest).json({ status: jsonStatus.BadRequest, message: messages[req.language].invalid.replace('##', messages[req.language].oldPassword) })
       }
+    } catch (error) {
+      catchError('admin.resetPassword', error, req, res)
+    }
+  }
+
+  async sendOTP (req, res) {
+    try {
+      req.body = pick(req.body, ['sEmail'])
+      const { sEmail } = req.body
+      const admin = await Admin.findOne({ sEmail }).lean()
+      if (!admin) { return res.status(status.BadRequest).json({ status: jsonStatus.BadRequest, message: messages[req.language].not_found.replace('##', messages[req.language].admin) }) }
+      const code = createRandomId()
+      // send otp on email function
+      await OTPVerifications.create({ sEmail: admin.sEmail, sCode: code })
+      return res.status(status.OK).json({ status: jsonStatus.OK, message: messages.English.OTP_sent_succ })
+    } catch (error) {
+      catchError('admin.sendOTP', error, req, res)
+    }
+  }
+
+  async verifyOTP (req, res) {
+    try {
+      req.body = pick(req.body, ['sCode', 'sEmail'])
+      const { sCode, sEmail } = req.body
+      const otpExist = await OTPVerifications.findOne({ sEmail }).sort({ dCreatedAt: -1 })
+      console.log(otpExist)
+      if (!otpExist) {
+        return res.status(status.BadRequest).json({ status: jsonStatus.BadRequest, message: messages.English.invalid.replace('##', messages.English.otp) })
+      }
+      // already verified
+      if (otpExist.bIsVerify) {
+        console.log('*********')
+        return res.status(status.BadRequest).json({ status: jsonStatus.BadRequest, message: messages.English.invalid.replace('##', messages.English.otp) })
+      }
+      if (sCode !== otpExist.sCode) {
+        return res.status(status.BadRequest).json({ status: jsonStatus.BadRequest, message: messages.English.invalid.replace('##', messages.English.otp) })
+      }
+      otpExist.bIsVerify = true
+      await otpExist.save()
+      return res.status(status.OK).json({ status: jsonStatus.OK, message: messages.English.OTP_verify_succ })
+    } catch (error) {
+      catchError('admin.verifyOTP', error, req, res)
+    }
+  }
+
+  async resetPassword (req, res) {
+    try {
+      req.body = pick(req.body, ['sPassword'])
+      const { sPassword } = req.body
+      const { email } = req.params
+      const otpVerified = await OTPVerifications.findOne({ sEmail: email }).sort({ dCreatedAt: -1 })
+      if (otpVerified.bIsVerify !== true) {
+        return res.status(status.BadRequest).json({ status: jsonStatus.BadRequest, message: messages[req.language].invalid.replace('##', messages[req.language].otp) })
+      }
+      const pass = await hash(sPassword)
+      await Admin.updateOne({ sEmail: email }, { sPassword: pass })
+      return res.status(status.OK).json({ status: jsonStatus.OK, message: messages.English.Pass_reset_succ })
     } catch (error) {
       catchError('admin.resetPassword', error, req, res)
     }
